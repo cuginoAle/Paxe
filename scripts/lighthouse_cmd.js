@@ -10,7 +10,7 @@ async function test ({ url, name }, opts, config = null) {
   return {
     summary: {
       'Issues count': `${issues.length?chalk.red(issues.length):chalk.green(issues.length)}`,
-      'Page': `${chalk.yellow(name)} -> ${chalk.blue(url)}`,
+      'Page': `${name} -> ${chalk.blue(url)}`,
       'Report': `./output/${name}.html`
     },
     report: results.html

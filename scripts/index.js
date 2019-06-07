@@ -4,7 +4,7 @@ const spinner = require('./spinner')
 const inSequence = require('./insequence')
 const chalk = require('chalk')
 const fs = require('fs')
-const { table } = require ('table')
+const { table, getBorderCharacters } = require ('table')
   
 // importing the urls to check list
 const urlsObj = require('./urls')
@@ -42,15 +42,11 @@ inSequence(tests).then(() => {
   log()
 
   log(chalk.bgBlackBright.black(' Lighthouse: '))
-  log(table(lh_Results.map(item => {
-    return Object.values(item.summary)
-  })))
+  log(formatAsTable(lh_Results))
   log()
 
   log(chalk.bgBlackBright.black(' Pa11y: '))
-  log(table(pa_Results.map(item => {
-    return Object.values(item.summary)
-  })))
+  log(formatAsTable(pa_Results))
 })
 
 async function testUrl (name, i, length) {
@@ -70,4 +66,32 @@ async function testUrl (name, i, length) {
 
   lh_Results.push(lhResults)
   pa_Results.push(paResults)
+}
+
+
+function formatAsTable(results){
+  const config = {
+    border: getBorderCharacters(`norc`)
+  };
+
+  const data=results.map(item => {
+    const {
+      'Issues count': Issues,
+      Page,
+      Report,
+    } = item.summary
+    
+    return [
+      Issues,
+      Page,
+      `🔗 ${chalk.blue(Report)}`
+    ]
+  })
+
+  return table([
+    ['Issues count', 'Page', 'Report'],
+    ...data
+    ],
+    config
+  )  
 }
