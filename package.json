@@ -1,0 +1,20 @@
+{
+  "name": "a11ytests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run pa11y && npm run lh",
+    "pa11y": "node ./scripts/pa11y.js",
+    "lh": "node ./scripts/lighthouse.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@cuginoale/pa11y-report-html": "^1.0.1",
+    "chalk": "^2.4.2",
+    "chrome-launcher": "^0.10.7",
+    "lighthouse": "^5.1.0",
+    "pa11y": "^5.1.0"
+  }
+}
