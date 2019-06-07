@@ -4,7 +4,7 @@
 //     rootElement: 'main>section',
 //     viewport: { "width": 480, "height": 600 }
 //   }
-// },  
+// },
 // channels_desktop:{
 //   url:'http://telus.com/en/shop/home/pik/channels',
 //   options:{
@@ -13,12 +13,15 @@
 //   }
 // }
 
-module.exports={
-  bbc:{
-    url:'http://bbc.com'
+module.exports = {
+  'Pik Home': {
+    url: 'http://telus.com/en/shop/home/pik',
+    options: {
+      rootElement: 'main>section',
+      viewport: { 'width': 1280, 'height': 1024 }
+    }
   },
-  google:{
-    url:'http://google.com'
+  'Telus.com': {
+    url: 'http://telus.com'
   }
 }
-  

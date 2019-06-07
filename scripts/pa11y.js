@@ -1,13 +1,13 @@
-const fs = require('fs');
-const chalk = require('chalk');
+const fs = require('fs')
+const chalk = require('chalk')
 
-const html = require('@cuginoale/pa11y-report-html');
-const pa11y = require('pa11y');
+const html = require('@cuginoale/pa11y-report-html')
+const pa11y = require('pa11y')
 const spinner = require('./spinner')
 const inSequence = require('./insequence')
 
-//importing the urls to check list
-const urlsObj = require('./urls');
+// importing the urls to check list
+const urlsObj = require('./urls')
 const errorsList = []
 
 const {
@@ -29,11 +29,11 @@ const defaultOptions = (name) => {
   }
 }
 
-const checks = Object.keys(urlsObj).map(name => processUrl.bind(null,name))
+const checks = Object.keys(urlsObj).map(name => processUrl.bind(null, name))
 
-inSequence(checks).then(()=> {
+inSequence(checks).then(() => {
   log('-----------------')
-  
+
   table(errorsList.map(item => {
     return {
       'Issues Count': item.issues.length,
@@ -43,9 +43,9 @@ inSequence(checks).then(()=> {
   }))
 })
 
-async function processUrl(name){
+async function processUrl (name) {
   const url = urlsObj[name].url
-  const start=Date.now()
+  const start = Date.now()
 
   let urlOpts = {
     ...defaultOptions(name),
@@ -68,10 +68,8 @@ async function processUrl(name){
         url,
         name
       })
-      log(`🕑 Completed in ${chalk.green((Date.now() - start)/1000)}s.`)
+      log(`🕑 Completed in ${chalk.green((Date.now() - start) / 1000)}s.`)
     })
-
-
   } catch (error) {
     log('')
     log('*** *** ***')
@@ -80,17 +78,16 @@ async function processUrl(name){
     log('*** *** ***')
     log('')
   }
-
 }
 
-async function processResults({results, name}) {
+async function processResults ({ results, name }) {
   const fileName = `${output}/${name}.html`
-  const htmlResults = await html.results(results, `${name}.png`);
+  const htmlResults = await html.results(results, `${name}.png`)
 
   fs.writeFileSync(fileName, htmlResults)
 
   if (results.issues.length) {
-    errorsList.push({...results, htmlReport: fileName})
+    errorsList.push({ ...results, htmlReport: fileName })
     log(chalk.white.bgRed(` Found: ${results.issues.length} errors, see report here => ${chalk.underline(fileName)}`))
   } else {
     log(chalk.green('No errors...'))
