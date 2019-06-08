@@ -14,14 +14,7 @@
 // }
 
 module.exports = {
-  'Pik Home': {
-    url: 'http://telus.com/en/shop/home/pik',
-    options: {
-      rootElement: 'main>section',
-      viewport: { 'width': 1280, 'height': 1024 }
-    }
-  },
-  'Telus.com': {
-    url: 'http://telus.com'
+  'bbc.com': {
+    url: 'http://bbc.com'
   }
 }
