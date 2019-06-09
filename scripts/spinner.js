@@ -284,10 +284,11 @@ function spinner(theme, trackTime = true) {
       frames: ["-", "=", "≡"]
     }
   };
-  const {
+  let {
     frames,
     interval
   } = spinners[theme]
+
   let intervalHnd = null
   let x = 0;
   let t = 0;
@@ -295,28 +296,37 @@ function spinner(theme, trackTime = true) {
   let spinnerTheme = theme
   let startTime = Date.now()
 
-  const {
+  let {
     frames: clockFrames
   } = spinners.clock
 
   return {
-    start: (label = '') => {
+    start: ({theme, label='', iconBefore=false}) => {
       clearInterval(intervalHnd)
       spinnerLabel = label
+      if(theme){
+        frames = spinners[theme].frames
+        interval = spinners[theme].interval
+      }
+      
       intervalHnd = setInterval(function () {
+        const msg = iconBefore ? `${frames[x++]}${spinnerLabel}` : `${spinnerLabel}${frames[x++]}`
         if(trackTime){
           let now = Date.now()
-          process.stdout.write(`\r${clockFrames[t++]}${parseInt((now - startTime)/1000)} ${spinnerLabel}${frames[x++]} `);
+          process.stdout.write(`\r${clockFrames[t++]}${parseInt((now - startTime)/1000)} ${msg} `);
           t = t % clockFrames.length;
         }else{
-          process.stdout.write(`\r${spinnerLabel}${frames[x++]} `);
+          process.stdout.write(`\r${msg} `);
         }
         x = x % frames.length;
       }, interval);
     },
     update: ({label, theme}) => {
       spinnerLabel = label || spinnerLabel
-      spinnerTheme = theme || spinnerTheme
+      if(theme){
+        frames = spinners[theme].frames
+        interval = spinners[theme].interval
+      }
     },
     success: (msg = 'done') => {   
       clearInterval(intervalHnd)   
