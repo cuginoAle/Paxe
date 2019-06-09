@@ -14,7 +14,7 @@
 // }
 
 module.exports = {
-  'bbc.com': {
-    url: 'http://bbc.com'
+  'telus.com': {
+    url: 'http://telus.com'
   }
 }
