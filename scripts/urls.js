@@ -14,16 +14,34 @@
 // }
 
 module.exports = {
-  channels_mobile:{
+  channels:{
     url:'http://telus.com/en/shop/home/pik/channels',
     options:{
-      viewport: { "width": 480, "height": 600 }
+      viewports: [
+        { "width": 320, "height": 568 },
+        { "width": 800, "height": 600 },
+        { "width": 1280, "height": 1024 }
+      ]
     }
   },
-  channels_desktop:{
-    url:'http://telus.com/en/shop/home/pik/channels',
+  panels:{
+    url:'http://telus.com/en/shop/home/pik/panels',
     options:{
-      viewport: { "width": 1280, "height": 1024 }
+      viewports: [
+        { "width": 320, "height": 568 },
+        { "width": 800, "height": 600 },
+        { "width": 1280, "height": 1024 }
+      ]
+    }
+  },
+  addons:{
+    url:'http://telus.com/en/shop/home/pik/addons',
+    options:{
+      viewports: [
+        { "width": 320, "height": 568 },
+        { "width": 800, "height": 600 },
+        { "width": 1280, "height": 1024 }
+      ]
     }
   }
 }
