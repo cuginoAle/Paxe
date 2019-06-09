@@ -13,7 +13,7 @@ async function test({ name,url }, opts = {}) {
   const results = []
   await page.setBypassCSP(true)
 
-  const {viewports, runOnly, resultTypes, events = ()=>{}, ...optRest} = opts
+  const {viewports, runOnly, resultTypes, events = ()=>{}, destFolder, ...optRest} = opts
 
   await page.goto(url)
   events.onLoad()
@@ -28,7 +28,7 @@ async function test({ name,url }, opts = {}) {
   const mergedOptions = {...options, ...optRest}
 
   if (viewports) {
-    const vpTests = opts.viewports.map( vp => prepare.bind(null, {vp, name, url, page, mergedOptions, results, events}))
+    const vpTests = opts.viewports.map( vp => prepare.bind(null, {vp, name, url, page, mergedOptions, results, events, destFolder}))
 
     await inSequence(vpTests)    
     await page.close()
@@ -45,20 +45,21 @@ async function test({ name,url }, opts = {}) {
 
 }
 
-async function prepare({vp, name, url, page, options, results, events }){
+async function prepare({vp, name, url, page, options, results, events, destFolder }){
   
   events.onResize(`${vp.width} x ${vp.height}`)
   await page.setViewport(vp)
 
   events.onTest(`${vp.width} x ${vp.height}`)
-  results.push(await runTest({name, url, page, options}))
+  results.push(await runTest({name:`${name}_${vp.width}x${vp.height}`, url, page, options, destFolder}))
 }
 
 async function runTest({
   name,
   url,
   page,
-  options
+  options,
+  destFolder
 }) {
 
   const results = await new AxePuppeteer(page)
@@ -66,7 +67,7 @@ async function runTest({
     .analyze()
 
   await page.screenshot({
-    path: `./output/${name}.png`,
+    path: `${destFolder}/${name}.png`,
     fullPage: true
   });
 
@@ -74,7 +75,7 @@ async function runTest({
     summary: {
       'Issues count': `${results.violations.length?chalk.red(results.violations.length):chalk.green(results.violations.length)}`,
       'Page': `${name} -> ${chalk.blue(url)}`,
-      'Report': `./output/${name}.html`
+      'Report': `${destFolder}/${name}.html`
     },
     report: null
   }

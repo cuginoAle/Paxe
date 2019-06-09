@@ -1,10 +1,10 @@
 {
-  "name": "a11ytests",
-  "version": "1.0.0",
+  "name": "paxe",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node ./scripts/index.js",
+    "test": "node ./scripts/index.js $npm_package_version",
     "pa11y": "node ./scripts/pa11y.js",
     "lh": "node ./scripts/lighthouse.js"
   },
