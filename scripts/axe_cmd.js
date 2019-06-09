@@ -24,7 +24,7 @@ const chalk = require('chalk')
       .analyze()
 
     await page.screenshot({
-      path: `${name}.png`,
+      path: `./output/${name}.png`,
       fullPage: true
     });
 
