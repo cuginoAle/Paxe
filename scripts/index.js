@@ -21,12 +21,11 @@ const ver = process.argv[2]
 let paxeLogo=[
 ' __             ___ ',
 '|__)   /\\  \\_/ |__  ',
-`|   . /~~\\ / \\ |___            ${ver}`,
+`|     /~~\\ / \\ |___            ${ver}`,
 '------------------------------------',
 'Puppeteer & Axe ♿ testing framework',
 ''
 ]
-
 
 paxeLogo.forEach(line => log(chalk.green(line)))
 
@@ -34,7 +33,7 @@ const ax_Results = []
 
 // getting settings from CLI
 const runOnly = process.env.npm_config_runOnly ? process.env.npm_config_runOnly.split(',') : []
-const keys=Object.keys(urlsObj).filter(k => runOnly.includes(k) )
+const keys=Object.keys(urlsObj).filter(k => runOnly.length ? runOnly.includes(k) : true )
 
 const tests = keys.map((name, i) => testUrl.bind(null, name, i+1, keys.length, urlsObj[name].options))
 const start = Date.now()
@@ -81,22 +80,28 @@ function formatAsTable(results){
     border: getBorderCharacters(`norc`)
   };
 
-  const data=results.map(item => {
+  const data=results.map(item => {    
     const {
-      'Issues count': Issues,
+      Critical,
+      Serious,
+      Moderate,
+      Minor,
       Page,
       Report,
     } = item.summary
     
     return [
-      Issues,
+      Critical,
+      Serious,
+      Moderate,
+      Minor,
       Page,
       `🔗 ${chalk.blue(Report)}`
     ]
   })
 
   return table([
-    ['Issues count', 'Page', 'Report'],
+    ['Critical', 'Serious','Moderate','Minor', 'Page', 'Report'],
     ...data
     ],
     config

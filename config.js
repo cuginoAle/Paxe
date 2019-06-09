@@ -22,5 +22,11 @@ module.exports = {
     options:{
       viewports
     }
+  },
+  google:{
+    url:'http://google.com',
+    options:{
+      viewports
+    }
   }
 }

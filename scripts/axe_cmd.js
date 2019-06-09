@@ -71,9 +71,38 @@ async function runTest({
     fullPage: true
   });
 
+  const critical = results.violations.filter(v => v.impact==='critical')
+  const serious = results.violations.filter(v => v.impact==='serious')
+  const moderate = results.violations.filter(v => v.impact==='moderate')
+  const minor = results.violations.filter(v => v.impact==='minor')
+
+  const targetElements = []
+
+  results.violations.forEach(v => {
+    v.nodes.forEach(node => {
+      node.target.forEach(target => {
+        targetElements.push(target)        
+      })
+    })
+  })
+  
+  await page.addStyleTag({content:`
+    ${targetElements.join(',')}{
+      box-shadow: 0px 0px 5px 1px red;
+    }
+  `})
+
+  await page.screenshot({
+    path: `${destFolder}/marked_${name}.png`,
+    fullPage: true
+  })  
+
   return {
     summary: {
-      'Issues count': `${results.violations.length?chalk.red(results.violations.length):chalk.green(results.violations.length)}`,
+      'Critical': `${critical.length?chalk.yellow.bgRed(critical.length):chalk.green(0)}`,
+      'Serious': `${serious.length?chalk.red(serious.length):chalk.green(0)}`,
+      'Moderate': `${moderate.length?chalk.yellowBright(moderate.length):chalk.green(0)}`,
+      'Minor': `${minor.length?chalk.yellow(minor.length):chalk.green(0)}`,
       'Page': `${name} -> ${chalk.blue(url)}`,
       'Report': `${destFolder}/${name}.html`
     },
