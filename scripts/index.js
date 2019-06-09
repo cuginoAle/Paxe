@@ -6,9 +6,9 @@ const fs = require('fs')
 const { table, getBorderCharacters } = require ('table')
   
 // importing the urls to check list
-const urlsObj = require('./urls')
+const urlsObj = require('../config')
 const bar = spinner('earth')
-const output = './output'
+const destFolder = './output'
 
 const {
   log,
@@ -16,10 +16,12 @@ const {
 } = console
 
 clear()
+const ver = process.argv[2]
+
 let paxeLogo=[
 ' __             ___ ',
 '|__)   /\\  \\_/ |__  ',
-'|   . /~~\\ / \\ |___              0.1',
+`|   . /~~\\ / \\ |___            ${ver}`,
 '------------------------------------',
 'Puppeteer & Axe ♿ testing framework',
 ''
@@ -30,7 +32,10 @@ paxeLogo.forEach(line => log(chalk.green(line)))
 
 const ax_Results = []
 
-const keys=Object.keys(urlsObj)
+// getting settings from CLI
+const runOnly = process.env.npm_config_runOnly ? process.env.npm_config_runOnly.split(',') : []
+const keys=Object.keys(urlsObj).filter(k => runOnly.includes(k) )
+
 const tests = keys.map((name, i) => testUrl.bind(null, name, i+1, keys.length, urlsObj[name].options))
 const start = Date.now()
 
@@ -53,6 +58,7 @@ async function testUrl (name, i, length, options) {
 
   const opts = {
     ...options,
+    destFolder,
     events:{
       onLoad:()=> bar.success('loaded'),
       onResize:(size)=> bar.start({label:`Resizing: ${size}`, theme:'dots'}),
