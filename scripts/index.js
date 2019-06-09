@@ -1,5 +1,3 @@
-const pa11y = require('./pa11y_cmd')
-const lighthouse = require('./lighthouse_cmd')
 const axe = require('./axe_cmd')
 const spinner = require('./spinner')
 const inSequence = require('./insequence')
@@ -9,7 +7,7 @@ const { table, getBorderCharacters } = require ('table')
   
 // importing the urls to check list
 const urlsObj = require('./urls')
-const bar = spinner('fish')
+const bar = spinner('earth')
 const output = './output'
 
 const {
@@ -18,31 +16,20 @@ const {
 } = console
 
 clear()
-const paxeLogo=[
-' __            ___ ',
-'|__)  /\\  \\_/ |__  ',
-'|    /~~\\ / \\ |___    v.0.1',
-'-----------------------------'
+let paxeLogo=[
+' __             ___ ',
+'|__)   /\\  \\_/ |__  ',
+'|   . /~~\\ / \\ |___              0.1',
+'------------------------------------',
+'Puppeteer & Axe ♿ testing framework',
+''
 ]
+
 
 paxeLogo.forEach(line => log(chalk.green(line)))
 
-const pa_Results = []
-const lh_Results = []
 const ax_Results = []
 
-const lighthouseOpts = {
-  output: 'html',
-  chromeFlags: ['--headless', '--disable-gpu'],
-  onlyCategories: ['accessibility']
-}
-
-const pa11yOptions = (name) => {
-  return {
-    screenCapture: `${output}/${name}.png`,
-    timeout: 40000
-  }
-}
 const keys=Object.keys(urlsObj)
 const tests = keys.map((name, i) => testUrl.bind(null, name, i+1, keys.length, urlsObj[name].options))
 const start = Date.now()
@@ -52,42 +39,34 @@ inSequence(tests).then(() => {
   log(`🕑 Completed in ${chalk.green((Date.now() - start) / 1000)}s.`)
   log()
 
-  log(chalk.bgBlackBright.black(' Lighthouse: '))
-  log(formatAsTable(lh_Results))
-  log()
-
-  log(chalk.bgBlackBright.black(' Pa11y: '))
-  log(formatAsTable(pa_Results))
-
-  log(chalk.bgBlackBright.black(' Axe: '))
+  log(chalk.bgBlackBright.black(' Report: '))
   log(formatAsTable(ax_Results))
 })
 
 async function testUrl (name, i, length, options) {
   const url = urlsObj[name].url
-  log(`${chalk.grey('testing:')} ${chalk.white.bold(name)} (${i}/${length})`)
+  log()
+  log(`Test ${i}/${length} => ${chalk.bold(name)} `)
 
   let start = Date.now()
-  bar.start(chalk.green('Lighthouse '))
-  const lhResults = await lighthouse.test({ url, name }, lighthouseOpts)
-  fs.writeFileSync(lhResults.summary.Report, lhResults.report)
-  bar.success(`Lighthouse: ${(Date.now()- start)/1000}s.`)
+  bar.start({label: "loading... "})
 
-  start = Date.now()
-  bar.start(chalk.green('Pa11y '))
-  const paResults = await pa11y.test({ url, name }, {...pa11yOptions(name), ...options})
-  fs.writeFileSync(paResults.summary.Report, paResults.report)
-  bar.success(`Pa11y: ${(Date.now()- start)/1000}s.`)
-
-  start = Date.now()
-  bar.start(chalk.green('Axe '))
-  const axResults = await axe.test({ url, name }, options)
+  const opts = {
+    ...options,
+    events:{
+      onLoad:()=> bar.success('loaded'),
+      onResize:(size)=> bar.start({label:`Resizing: ${size}`, theme:'dots'}),
+      onTest:(label)=> {
+        bar.success(`Resized to ${label}`)
+        bar.start({label:`Testing ${label} `, theme:'fish'})
+      }
+    }
+  }
+  
+  const axResults = await axe.test({ url, name }, opts)
   // fs.writeFileSync(axResults.summary.Report, axResults.report)
-  bar.success(`Axe: ${(Date.now()- start)/1000}s.`)
-
-  lh_Results.push(lhResults)
-  pa_Results.push(paResults)
-  ax_Results.push(axResults)
+  bar.success(`done: ${(Date.now()- start)/1000}s.`)
+  ax_Results.push(...axResults)
 }
 
 
