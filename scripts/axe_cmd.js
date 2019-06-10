@@ -1,4 +1,6 @@
+const fs = require('fs')
 const inSequence = require('./insequence')
+const htmlReport = require('axe_html_report')
 
 const {
   AxePuppeteer
@@ -77,6 +79,7 @@ async function runTest({
   const minor = results.violations.filter(v => v.impact==='minor')
 
   const targetElements = []
+  const screenshotName = `marked_${name}.png`
 
   results.violations.forEach(v => {
     v.nodes.forEach(node => {
@@ -93,9 +96,20 @@ async function runTest({
   `})
 
   await page.screenshot({
-    path: `${destFolder}/marked_${name}.png`,
+    path: `${destFolder}/${screenshotName}`,
     fullPage: true
   })  
+
+  const html = htmlReport({
+    title: name,
+    url,
+    issues: results.violations,
+    screenshot: screenshotName
+  })
+
+  const fileName = `${destFolder}/${name}.html`
+
+  fs.writeFileSync(fileName, html)
 
   return {
     summary: {
@@ -104,7 +118,7 @@ async function runTest({
       'Moderate': `${moderate.length?chalk.yellowBright(moderate.length):chalk.green(0)}`,
       'Minor': `${minor.length?chalk.yellow(minor.length):chalk.green(0)}`,
       'Page': `${name} -> ${chalk.blue(url)}`,
-      'Report': `${destFolder}/${name}.html`
+      'Report': fileName
     },
     report: null
   }

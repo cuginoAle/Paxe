@@ -1,7 +1,7 @@
 const viewports = [
-  { "width": 320, "height": 568 },
-  { "width": 800, "height": 600 },
-  { "width": 1280, "height": 1024 }
+  { "width": 360, "height": 640 },
+  { "width": 768, "height": 1024 },
+  { "width": 1440, "height": 900 }
 ]
 
 module.exports = {
@@ -23,8 +23,8 @@ module.exports = {
       viewports
     }
   },
-  google:{
-    url:'http://google.com',
+  BBC:{
+    url:'http://bbc.com',
     options:{
       viewports
     }

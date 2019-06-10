@@ -2,7 +2,6 @@ const axe = require('./axe_cmd')
 const spinner = require('./spinner')
 const inSequence = require('./insequence')
 const chalk = require('chalk')
-const fs = require('fs')
 const { table, getBorderCharacters } = require ('table')
   
 // importing the urls to check list
