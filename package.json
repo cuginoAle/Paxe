@@ -1,14 +1,26 @@
 {
   "name": "paxe",
   "version": "0.2.0",
-  "description": "",
+  "description": "Puppeteer & Axe ♿ testing framework",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/cuginoAle/a11yTests.git"
+  },
+  "keywords":[
+    "accessibility",
+    "puppeteer",
+    "axe",
+    "automated",
+    "tests",
+    "wcga"
+  ],
   "main": "index.js",
   "scripts": {
     "test": "node ./scripts/index.js $npm_package_version",
     "pa11y": "node ./scripts/pa11y.js",
     "lh": "node ./scripts/lighthouse.js"
   },
-  "author": "",
+  "author": "Alessio Carnevale",
   "license": "ISC",
   "dependencies": {
     "axe-puppeteer": "^1.0.0",
