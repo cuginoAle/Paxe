@@ -7,5 +7,5 @@ Puppeteer & Axe ♿ testing framework
 ```
 
 # Get started
-- $> npm i paxe
+- $> npm i -g paxe
 - $> paxe
