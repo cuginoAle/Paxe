@@ -17,12 +17,12 @@ const {
 clear()
 
 const argv = require('yargs')
-      .usage('Usage: paxe [<option>]')
-      .option('runOnly', {
-        alias: 'o',
-        describe: 'Comma separated list of URLs'
-      })
-      .argv
+  .usage('Usage: paxe [<option>]')
+  .option('runOnly', {
+    alias: 'o',
+    describe: 'Comma separated list of URLs'
+  })
+  .argv
 
 const {
   table,
@@ -48,55 +48,57 @@ const reportLogo = paxeLogo.map(l => `<p>${l.replace(/ /g, '\u00a0')}</p>`).join
 paxeLogo.forEach(line => log(chalk.green(line)))
 
 // getting settings from CLI
-const runOnly = process.env.npm_config_runOnly ? process.env.npm_config_runOnly.split(',') : argv.runOnly ? argv.runOnly.split(','): []
+const runOnly = process.env.npm_config_runOnly ? process.env.npm_config_runOnly.split(',') : argv.runOnly ? argv.runOnly.split(',') : []
 
-;(async ()=>{
-  const config = await getConfig()  
+;(async () => {
+  const config = await getConfig()
   const urlsObj = config.urls
   const ax_Results = []
   const keys = Object.keys(urlsObj).filter(k => runOnly.length ? runOnly.includes(k) : true)
-  
+
   const tests = keys.map((name, i) => testUrl.bind(
-      null,
-      name,
-      i + 1,
-      keys.length,
-      {
-        ...config.default,
-        ...urlsObj[name].options,
-        logo: reportLogo
-      }
-    )
+    null,
+    name,
+    i + 1,
+    keys.length,
+    {
+      ...config.default,
+      ...urlsObj[name].options,
+      logo: reportLogo
+    }
+  )
   )
   const start = Date.now()
-  
+
   inSequence(tests).then(() => {
     log()
     log(`🕑 Completed in ${chalk.green((Date.now() - start) / 1000)}s.`)
     log()
-  
+
     log(chalk.bgBlackBright.black(' Report: '))
     log(formatAsTable(ax_Results))
-  
+
     generateGlobalHtmlReport(ax_Results, `${destFolder}/globalReport.html`)
-  
+
     log(`Global report available here: 🔗 ${chalk.blue(`${destFolder}/globalReport.html`)}`)
     log()
+    const CriticalCount = ax_Results.reduce((acc, value) => acc + value.summary.Critical.length, 0)
+    process.exitCode = CriticalCount > 0 ? 1 : 0
   })
-  
-  async function testUrl(name, i, length, options) {
+
+  async function testUrl (name, i, length, options) {
     const url = urlsObj[name].url
     log()
     log(`Test ${i}/${length} => ${chalk.bold(name)} `)
-  
+
     let start = Date.now()
-  
+
     const opts = {
       ...options,
       destFolder,
       events: {
         onSuccess: (msg, icon) => progressBar.success(msg, icon),
-        onAttempt: (msg, theme='dots2', trackTime) => {
+        onAttempt: (msg, theme = 'dots2', trackTime) => {
           progressBar.start({
             label: msg,
             theme,
@@ -112,21 +114,21 @@ const runOnly = process.env.npm_config_runOnly ? process.env.npm_config_runOnly.
         onError: (err) => progressBar.fail(err)
       }
     }
-  
+
     const axResults = await axe.test({
       url,
       name
     }, opts)
-    
-    progressBar.success(`done: ${(Date.now()- start)/1000}s.`)
+
+    progressBar.success(`done: ${(Date.now() - start) / 1000}s.`)
     ax_Results.push(...axResults)
   }
-  
-  function formatAsTable(results) {
+
+  function formatAsTable (results) {
     const config = {
       border: getBorderCharacters(`norc`)
-    };
-  
+    }
+
     const data = results.map(item => {
       const {
         Critical,
@@ -135,24 +137,24 @@ const runOnly = process.env.npm_config_runOnly ? process.env.npm_config_runOnly.
         Minor,
         Page,
         Url,
-        Report,
+        Report
       } = item.summary
-  
+
       return [
-        `${Critical?chalk.yellow.bgRed(Critical):chalk.green('-')}`,
-        `${Serious?chalk.red(Serious):chalk.green('-')}`,
-        `${Moderate?chalk.yellowBright(Moderate):chalk.green('-')}`,
-        `${Minor?chalk.yellow(Minor):chalk.grey('-')}`,
+        `${Critical ? chalk.yellow.bgRed(Critical) : chalk.green('-')}`,
+        `${Serious ? chalk.red(Serious) : chalk.green('-')}`,
+        `${Moderate ? chalk.yellowBright(Moderate) : chalk.green('-')}`,
+        `${Minor ? chalk.yellow(Minor) : chalk.grey('-')}`,
         Page,
         `🔗 ${chalk.blue(Report)}`
       ]
     })
-  
+
     return table([
-        ['Critical', 'Serious', 'Moderate', 'Minor', 'Page', 'Report'],
-        ...data
-      ],
-      config
+      ['Critical', 'Serious', 'Moderate', 'Minor', 'Page', 'Report'],
+      ...data
+    ],
+    config
     )
   }
 })()
