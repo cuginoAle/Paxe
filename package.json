@@ -1,21 +1,38 @@
 {
-  "name": "a11ytests",
-  "version": "1.0.0",
-  "description": "",
+  "name": "paxe",
+  "version": "0.4.0",
+  "description": "Puppeteer & Axe ♿ testing framework",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cuginoAle/a11yTests.git"
+  },
+  "keywords": [
+    "accessibility",
+    "puppeteer",
+    "axe",
+    "automated",
+    "tests",
+    "wcga"
+  ],
   "main": "index.js",
+  "bin": {
+    "paxe": "./scripts/index.js"
+  },
   "scripts": {
-    "test": "node ./scripts/index.js",
+    "test": "node ./scripts/index.js $npm_package_version",
     "pa11y": "node ./scripts/pa11y.js",
     "lh": "node ./scripts/lighthouse.js"
   },
-  "author": "",
+  "author": "Alessio Carnevale",
   "license": "ISC",
   "dependencies": {
-    "@cuginoale/pa11y-report-html": "^1.0.1",
+    "axe-puppeteer": "^1.0.0",
+    "axe_html_report": "^0.1.3",
     "chalk": "^2.4.2",
-    "chrome-launcher": "^0.10.7",
-    "lighthouse": "^5.1.0",
-    "pa11y": "^5.1.0",
-    "table": "^5.4.0"
+    "inquirer": "^6.3.1",
+    "inquirer-fuzzy-path": "^2.0.3",
+    "puppeteer": "^1.17.0",
+    "table": "^5.4.1",
+    "yargs": "^13.2.4"
   }
 }

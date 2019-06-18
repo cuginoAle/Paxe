@@ -1,73 +1,158 @@
-const pa11y = require('./pa11y_cmd')
-const lighthouse = require('./lighthouse_cmd')
+#! /usr/bin/env node
+'use strict'
+
+const axe = require('./axe_cmd')
 const spinner = require('./spinner')
 const inSequence = require('./insequence')
 const chalk = require('chalk')
-const fs = require('fs')
-const { table } = require ('table')
-  
-// importing the urls to check list
-const urlsObj = require('./urls')
-const bar = spinner('fish')
-const output = './output'
+
+const packageJson = require('../package.json')
+const generateGlobalHtmlReport = require('./globalHtmlReport')
 
 const {
   log,
   clear
 } = console
 
-const pa_Results = []
-const lh_Results = []
-
-const lighthouseOpts = {
-  output: 'html',
-  chromeFlags: ['--headless', '--disable-gpu'],
-  onlyCategories: ['accessibility']
-}
-
-const pa11yOptions = (name) => {
-  return {
-    screenCapture: `${output}/${name}.png`,
-    timeout: 40000
-  }
-}
-const keys=Object.keys(urlsObj)
-const tests = keys.map((name, i) => testUrl.bind(null, name, i+1, keys.length))
-const start = Date.now()
 clear()
 
-inSequence(tests).then(() => {
-  log()
-  log(`🕑 Completed in ${chalk.green((Date.now() - start) / 1000)}s.`)
-  log()
+const argv = require('yargs')
+      .usage('Usage: paxe [<option>]')
+      .option('runOnly', {
+        alias: 'o',
+        describe: 'Comma separated list of URLs'
+      })
+      .argv
 
-  log(chalk.bgBlackBright.black(' Lighthouse: '))
-  log(table(lh_Results.map(item => {
-    return Object.values(item.summary)
-  })))
-  log()
+const {
+  table,
+  getBorderCharacters
+} = require('table')
 
-  log(chalk.bgBlackBright.black(' Pa11y: '))
-  log(table(pa_Results.map(item => {
-    return Object.values(item.summary)
-  })))
-})
+const getConfig = require('./getConfig')
 
-async function testUrl (name, i, length) {
-  const url = urlsObj[name].url
-  log(`${chalk.grey('testing:')} ${chalk.white.bold(name)} (${i}/${length})`)
+const progressBar = spinner()
+const destFolder = './output'
+const ver = packageJson.version
 
-  bar.start(chalk.green('Lighthouse '))
-  const lhResults = await lighthouse.test({ url, name }, lighthouseOpts)
-  fs.writeFileSync(lhResults.summary.Report, lhResults.report)
+let paxeLogo = [
+  ' __            ___ ',
+  '|__)  /\\  \\_/ |__  ',
+  `|    /~~\\ / \\ |___            ${ver}`,
+  '-----------------------------------',
+  'Puppeteer & Axe ♿ testing framework',
+  ''
+]
 
-  bar.update({ label: chalk.green('Pa11y ') })
+const reportLogo = paxeLogo.map(l => `<p>${l.replace(/ /g, '\u00a0')}</p>`).join('')
+paxeLogo.forEach(line => log(chalk.green(line)))
 
-  const paResults = await pa11y.test({ url, name }, pa11yOptions(name))
-  fs.writeFileSync(paResults.summary.Report, paResults.report)
+// getting settings from CLI
+const runOnly = process.env.npm_config_runOnly ? process.env.npm_config_runOnly.split(',') : argv.runOnly ? argv.runOnly.split(','): []
 
-  bar.stop()
-
-  lh_Results.push(lhResults)
-  pa_Results.push(paResults)
-}
+;(async ()=>{
+  const config = await getConfig()  
+  const urlsObj = config.urls
+  const ax_Results = []
+  const keys = Object.keys(urlsObj).filter(k => runOnly.length ? runOnly.includes(k) : true)
+  
+  const tests = keys.map((name, i) => testUrl.bind(
+      null,
+      name,
+      i + 1,
+      keys.length,
+      {
+        ...config.default,
+        ...urlsObj[name].options,
+        logo: reportLogo
+      }
+    )
+  )
+  const start = Date.now()
+  
+  inSequence(tests).then(() => {
+    log()
+    log(`🕑 Completed in ${chalk.green((Date.now() - start) / 1000)}s.`)
+    log()
+  
+    log(chalk.bgBlackBright.black(' Report: '))
+    log(formatAsTable(ax_Results))
+  
+    generateGlobalHtmlReport(ax_Results, `${destFolder}/globalReport.html`)
+  
+    log(`Global report available here: 🔗 ${chalk.blue(`${destFolder}/globalReport.html`)}`)
+    log()
+  })
+  
+  async function testUrl(name, i, length, options) {
+    const url = urlsObj[name].url
+    log()
+    log(`Test ${i}/${length} => ${chalk.bold(name)} `)
+  
+    let start = Date.now()
+  
+    const opts = {
+      ...options,
+      destFolder,
+      events: {
+        onSuccess: (msg, icon) => progressBar.success(msg, icon),
+        onAttempt: (msg, theme='dots2', trackTime) => {
+          progressBar.start({
+            label: msg,
+            theme,
+            trackTime
+          })
+        },
+        onTest: (msg) => {
+          progressBar.start({
+            label: `Testing ${msg} `,
+            theme: 'fish'
+          })
+        },
+        onError: (err) => progressBar.fail(err)
+      }
+    }
+  
+    const axResults = await axe.test({
+      url,
+      name
+    }, opts)
+    
+    progressBar.success(`done: ${(Date.now()- start)/1000}s.`)
+    ax_Results.push(...axResults)
+  }
+  
+  function formatAsTable(results) {
+    const config = {
+      border: getBorderCharacters(`norc`)
+    };
+  
+    const data = results.map(item => {
+      const {
+        Critical,
+        Serious,
+        Moderate,
+        Minor,
+        Page,
+        Url,
+        Report,
+      } = item.summary
+  
+      return [
+        `${Critical?chalk.yellow.bgRed(Critical):chalk.green('-')}`,
+        `${Serious?chalk.red(Serious):chalk.green('-')}`,
+        `${Moderate?chalk.yellowBright(Moderate):chalk.green('-')}`,
+        `${Minor?chalk.yellow(Minor):chalk.grey('-')}`,
+        Page,
+        `🔗 ${chalk.blue(Report)}`
+      ]
+    })
+  
+    return table([
+        ['Critical', 'Serious', 'Moderate', 'Minor', 'Page', 'Report'],
+        ...data
+      ],
+      config
+    )
+  }
+})()
