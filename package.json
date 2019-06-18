@@ -1,5 +1,5 @@
 {
-  "name": "paxe",
+  "name": "@cuginoale/paxe",
   "version": "0.4.1",
   "description": "Puppeteer & Axe ♿ testing framework",
   "repository": {
