@@ -1,6 +1,7 @@
 #! /usr/bin/env node
 'use strict'
 
+const fs = require('fs')
 const axe = require('./axe_cmd')
 const spinner = require('./spinner')
 const inSequence = require('./insequence')
@@ -32,7 +33,6 @@ const {
 const getConfig = require('./getConfig')
 
 const progressBar = spinner()
-const destFolder = './output'
 const ver = packageJson.version
 
 let paxeLogo = [
@@ -52,6 +52,12 @@ const runOnly = process.env.npm_config_runOnly ? process.env.npm_config_runOnly.
 
 ;(async () => {
   const config = await getConfig()
+  const destFolder = config.default.outputFolder
+
+  if (!fs.existsSync(destFolder)) {
+    fs.mkdirSync(destFolder)
+  }
+
   const urlsObj = config.urls
   const ax_Results = []
   const keys = Object.keys(urlsObj).filter(k => runOnly.length ? runOnly.includes(k) : true)
