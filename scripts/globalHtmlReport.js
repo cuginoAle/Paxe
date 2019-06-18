@@ -95,16 +95,25 @@ const styles = `
   }
 `
 
-module.exports = function(results, fileName){
+module.exports = function (results, fileName) {
   const data = results.map(item => {
+    const {
+      Critical,
+      Serious,
+      Moderate,
+      Minor,
+      Page,
+      Report
+    } = item.summary
+
     return {
       Critical,
       Serious,
       Moderate,
       Minor,
       Page,
-      Report,
-    } = item.summary
+      Report
+    }
   })
 
   const html = `
@@ -127,7 +136,7 @@ module.exports = function(results, fileName){
           <ul>
             ${data.map((r, i) => (`
               <li>
-                <button class="nav_button ${i===0?'active':''}">
+                <button class="nav_button ${i === 0 ? 'active' : ''}">
                   ${r.Critical ? `<span class='level_Critical'>${r.Critical}</span>` : `<span>-</span>`}
                   ${r.Serious ? `<span class='level_Serious'>${r.Serious}</span>` : `<span>-</span>`}
                   ${r.Moderate ? `<span class='level_Moderate'>${r.Moderate}</span>` : `<span>-</span>`}
@@ -141,9 +150,9 @@ module.exports = function(results, fileName){
         </nav>
         <div class="results">
           ${data.map((r, index) => {
-            const dataSrc = r.Report.split('/').pop()
-            return `<iframe style="display:${index===0?'block':'none'}" src="${index===0?dataSrc:''}" data-src=${dataSrc}></iframe>`
-          }).join('')}
+    const dataSrc = r.Report.split('/').pop()
+    return `<iframe style="display:${index === 0 ? 'block' : 'none'}" src="${index === 0 ? dataSrc : ''}" data-src=${dataSrc}></iframe>`
+  }).join('')}
         </div>
       </main>
       <footer></footer>
