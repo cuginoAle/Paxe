@@ -22,7 +22,11 @@ async function test ({ name, url }, opts = {}) {
   }
 
   events.onAttempt('loading... ', 'earth', true)
-  await page.goto(url)
+  try {
+    await page.goto(url)
+  } catch (error) {
+    throw error
+  }
   events.onSuccess('loaded')
 
   if (actions) {

@@ -59,7 +59,7 @@ const runOnly = process.env.npm_config_runOnly ? process.env.npm_config_runOnly.
   }
 
   const urlsObj = config.urls
-  const ax_Results = []
+  const axResults = []
   const keys = Object.keys(urlsObj).filter(k => runOnly.length ? runOnly.includes(k) : true)
 
   const tests = keys.map((name, i) => testUrl.bind(
@@ -72,8 +72,8 @@ const runOnly = process.env.npm_config_runOnly ? process.env.npm_config_runOnly.
       ...urlsObj[name].options,
       logo: reportLogo
     }
-  )
-  )
+  ))
+
   const start = Date.now()
 
   inSequence(tests).then(() => {
@@ -82,13 +82,13 @@ const runOnly = process.env.npm_config_runOnly ? process.env.npm_config_runOnly.
     log()
 
     log(chalk.bgBlackBright.black(' Report: '))
-    log(formatAsTable(ax_Results))
+    log(formatAsTable(axResults))
 
-    generateGlobalHtmlReport(ax_Results, `${destFolder}/globalReport.html`)
+    generateGlobalHtmlReport(axResults, `${destFolder}/globalReport.html`)
 
     log(`Global report available here: 🔗 ${chalk.blue(`${destFolder}/globalReport.html`)}`)
     log()
-    const CriticalCount = ax_Results.reduce((acc, value) => acc + value.summary.Critical.length, 0)
+    const CriticalCount = axResults.reduce((acc, value) => acc + value.summary.Critical.length, 0)
     process.exitCode = CriticalCount > 0 ? 1 : 0
   })
 
@@ -127,7 +127,7 @@ const runOnly = process.env.npm_config_runOnly ? process.env.npm_config_runOnly.
     }, opts)
 
     progressBar.success(`done: ${(Date.now() - start) / 1000}s.`)
-    ax_Results.push(...axResults)
+    axResults.push(...axResults)
   }
 
   function formatAsTable (results) {
