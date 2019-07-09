@@ -10,7 +10,7 @@ It runs from the command line and generates HTML reports for each page and each 
 
 # Get started
 ```shell
-- $> npm i -g @cuginoale/pax
+- $> npm i -g @cuginoale/paxe
 - $> cd path/to/your/project/folder
 - $> paxe
 ```
