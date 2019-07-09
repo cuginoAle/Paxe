@@ -1,24 +1,33 @@
 const fs = require('fs')
 const inquirer = require('inquirer')
+const askForUrlSteps = require('./askForUrlSteps')
+
 var path = require('path')
 
 inquirer.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'))
 
-const configPath = path.resolve(__dirname, '../.paxerc')
+var currentPath = process.cwd()
+const configPath = path.resolve(currentPath, '.paxerc')
 const {
   log
 } = console
 
+const defaultSettings = {
+  viewports: [{ 'width': 1440, 'height': 900 }]
+}
+
 module.exports = async () => {
+  log(`Looking for .paxerc in: ${configPath}`)
   if (fs.existsSync(configPath)) {
     const c = JSON.parse(fs.readFileSync(configPath))
-    return c
+
+    return { ...{ defaultSettings }, urls: {}, ...c }
   } else {
     log("No config file found, let's create one!")
     log('')
     log('Default settings:')
 
-    const defaultSettings = await inquirer
+    const wizardSettings = await inquirer
       .prompt([
         {
           type: 'checkbox',
@@ -42,8 +51,8 @@ module.exports = async () => {
           message: 'Select a folder to save the reports in',
           name: 'outputFolder',
           excludePath: nodePath => {
-            return nodePath.startsWith('.git') ||
-            nodePath.startsWith('node_modules')
+            return nodePath.indexOf('.git') > -1 ||
+            nodePath.indexOf('node_modules') > -1
           },
           rootPath: './',
           default: 'output',
@@ -86,7 +95,7 @@ module.exports = async () => {
         }
       })
 
-      defaultSettings.authenticate = {
+      wizardSettings.authenticate = {
         username: authName.username,
         password: authPwd.password
       }
@@ -96,54 +105,11 @@ module.exports = async () => {
     log('==== Pages to analyse ====')
 
     const urlsObj = {}
-    const urlsToAnalyse = [
-      {
-        type: 'input',
-        name: 'url',
-        message: 'What URL do you want to test? (you can omit `http://`)',
-        validate: function (answer) {
-          if (answer.length < 3) {
-            return 'Invalid url'
-          }
 
-          return true
-        }
-      },
-      {
-        type: 'input',
-        name: 'name',
-        message: "Let's give it a friendly name",
-        validate: function (answer) {
-          if (answer.length < 1) {
-            return 'Please type at least 1 char.'
-          }
-
-          return true
-        }
-      },
-      {
-        type: 'confirm',
-        name: 'askAgain',
-        message: 'Want to enter another URL (just hit enter for YES)?',
-        default: true
-      }
-    ]
-
-    async function ask () {
-      const answers = await inquirer.prompt(urlsToAnalyse)
-      const url = answers.url.indexOf('http://') === 0 ? answers.url : `http://${answers.url}`
-
-      urlsObj[answers.name] = { url }
-
-      if (answers.askAgain) {
-        await ask()
-      }
-    }
-
-    await ask()
+    await addUrl(urlsObj)
 
     const config = {
-      default: defaultSettings,
+      default: { ...defaultSettings, ...wizardSettings },
       urls: urlsObj
     }
 
@@ -151,5 +117,16 @@ module.exports = async () => {
     log('Wrote: ', configPath)
 
     return config
+  }
+}
+
+async function addUrl (urlsObj) {
+  const answers = await inquirer.prompt(askForUrlSteps)
+  const url = answers.url.indexOf('http://') === 0 ? answers.url : `http://${answers.url}`
+
+  urlsObj[answers.name] = { url }
+
+  if (answers.askAgain) {
+    await addUrl(urlsObj)
   }
 }

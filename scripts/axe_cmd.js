@@ -95,7 +95,13 @@ async function prepare ({ vp, name, url, page, options, results, events, destFol
   events.onSuccess(`Resized to ${vp.width} x ${vp.height}`)
 
   events.onTest(`${vp.width} x ${vp.height}`)
-  results.push(await runTest({ name: `${name}_${vp.width}x${vp.height}`, url, page, options, destFolder, logo }))
+  const reportName = `${name}_${vp.width}x${vp.height}`
+  try {
+    results.push(await runTest({ name: reportName, url, page, options, destFolder, logo }))
+  } catch (error) {
+    results.push(generateFailedTestPage({ error, destFolder, name: reportName, url }))
+    events.onError(error)
+  }
 }
 
 async function runTest ({
@@ -109,11 +115,6 @@ async function runTest ({
   const results = await new AxePuppeteer(page)
     .options(options)
     .analyze()
-
-  // await page.screenshot({
-  //   path: `${destFolder}/${name}.png`,
-  //   fullPage: true
-  // });
 
   const critical = results.violations.filter(v => v.impact === 'critical')
   const serious = results.violations.filter(v => v.impact === 'serious')
@@ -164,8 +165,59 @@ async function runTest ({
       'Page': name,
       'Url': url,
       'Report': fileName
-    },
-    report: null
+    }
+  }
+}
+
+function generateFailedTestPage ({ error, destFolder, name, url }) {
+  const html = `
+    <html>
+    <head>
+      <meta charset="utf-8" />
+      <title>PaXe - global report</title>    
+      <style>
+        body{
+          display: flex;
+          align-items: center;
+          justify-content: center;          
+          font-family: monospace;        
+          flex-direction: column;  
+        }
+        .label {
+          font-size: 1.2rem;
+        }
+        .error {
+          font-size: 1.6rem;
+          background-color: white;
+          padding: 1rem 2rem;
+          color: #ec542d;
+          border-radius: 5px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+      </style>   
+    </head>    
+      <body>
+        <p class="label">There has been an error while testing the page:</p>
+        <div class="error">
+          ${error}
+        </div>
+      </body>
+    </html>
+  `
+
+  const fileName = `${destFolder}/${name}.html`
+  fs.writeFileSync(fileName, html)
+
+  return {
+    summary: {
+      'Critical': 'N/A',
+      'Serious': 'N/A',
+      'Moderate': 'N/A',
+      'Minor': 'N/A',
+      'Page': name,
+      'Url': url,
+      'Report': fileName
+    }
   }
 }
 

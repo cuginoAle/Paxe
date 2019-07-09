@@ -134,9 +134,9 @@ module.exports = function (results, fileName) {
           <h1>Global report</h1>
           <p class='timeStamp'>${(new Date()).toLocaleDateString()} - ${(new Date()).toLocaleTimeString()}</p>
           <ul>
-            ${data.map((r, i) => (`
+            ${data.map((r, index) => (`
               <li>
-                <button class="nav_button ${i === 0 ? 'active' : ''}">
+                <button class="nav_button ${index === 0 ? 'active' : ''}">
                   ${r.Critical ? `<span class='level_Critical'>${r.Critical}</span>` : `<span>-</span>`}
                   ${r.Serious ? `<span class='level_Serious'>${r.Serious}</span>` : `<span>-</span>`}
                   ${r.Moderate ? `<span class='level_Moderate'>${r.Moderate}</span>` : `<span>-</span>`}

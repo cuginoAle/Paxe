@@ -7,7 +7,7 @@ const spinner = require('./spinner')
 const inSequence = require('./insequence')
 const chalk = require('chalk')
 
-const packageJson = require('../package.json')
+const ver = require('../package.json').version
 const generateGlobalHtmlReport = require('./globalHtmlReport')
 
 const {
@@ -21,7 +21,7 @@ const argv = require('yargs')
   .usage('Usage: paxe [<option>]')
   .option('runOnly', {
     alias: 'o',
-    describe: 'Comma separated list of URLs'
+    describe: 'Comma separated list of URLs (friendly names)'
   })
   .argv
 
@@ -33,7 +33,6 @@ const {
 const getConfig = require('./getConfig')
 
 const progressBar = spinner()
-const ver = packageJson.version
 
 let paxeLogo = [
   ' __            ___ ',
@@ -82,6 +81,7 @@ const runOnly = process.env.npm_config_runOnly ? process.env.npm_config_runOnly.
     log()
 
     log(chalk.bgBlackBright.black(' Report: '))
+
     log(formatAsTable(axResults))
 
     generateGlobalHtmlReport(axResults, `${destFolder}/globalReport.html`)
@@ -121,13 +121,13 @@ const runOnly = process.env.npm_config_runOnly ? process.env.npm_config_runOnly.
       }
     }
 
-    const axResults = await axe.test({
+    const testResults = await axe.test({
       url,
       name
     }, opts)
 
     progressBar.success(`done: ${(Date.now() - start) / 1000}s.`)
-    axResults.push(...axResults)
+    axResults.push(...testResults)
   }
 
   function formatAsTable (results) {
