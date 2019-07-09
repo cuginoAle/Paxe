@@ -8,6 +8,8 @@ Puppeteer & Axe ♿ testing framework
 Paxe is an automated accessibility testing tool based on [Puppeteer](https://github.com/GoogleChrome/puppeteer) and [Axe](https://github.com/dequelabs/axe-core).
 It runs from the command line and generates HTML reports for each page and each viewport analysed.
 
+**It is still a WIP, feedbacks and contributions are highly appreciated!**
+
 # Get started
 ```shell
 - $> npm i -g @cuginoale/paxe
