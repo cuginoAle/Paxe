@@ -9,9 +9,11 @@ Paxe is an automated accessibility testing tool based on [Puppeteer](https://git
 It runs from the command line and generates HTML reports for each page and each viewport analysed.
 
 # Get started
+```shell
 - $> npm i -g paxe
 - $> cd path/to/your/project/folder
 - $> paxe
+```
 
 On first run Paxe will look for the `.paxerc` in the current folder. If it can't find it, Paxe wizard will guide you through the steps to create a basic configuration file (still w.i.p.)
 
@@ -68,8 +70,9 @@ The `options` section for each `url` is optional and can contain:
 The `actions` available are currently limited to `click` and `waitFor`. It can be mapped to perform all the actions Puppeteer is capable to run on the `page` object (see relevant doc)
 
 ## Cli
-$> `paxe --help` 
-```
+```shell
+$> paxe --help
+
 Usage: paxe [<option>]
 
 Options:
@@ -79,4 +82,6 @@ Options:
 ```
 To test only some of the URLs listed in the .p`axerc` file use `--runOnly` or `-o` followed by the `friendly name` of the urls to test:
 
-`$> paxe -o site1,site2,site3`
+```shell
+$> paxe -o site1,site2,site3
+```
