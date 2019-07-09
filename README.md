@@ -78,4 +78,5 @@ Options:
   --runOnly, -o  Comma separated list of URLs (friendly names)
 ```
 To test only some of the URLs listed in the .p`axerc` file use `--runOnly` or `-o` followed by the `friendly name` of the urls to test:
-`$> paxe -o site1,site2,site3
+
+`$> paxe -o site1,site2,site3`
