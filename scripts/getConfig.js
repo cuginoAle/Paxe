@@ -122,7 +122,7 @@ module.exports = async () => {
 
 async function addUrl (urlsObj) {
   const answers = await inquirer.prompt(askForUrlSteps)
-  const url = answers.url.indexOf('http://') === 0 ? answers.url : `http://${answers.url}`
+  const url = answers.url.indexOf('http') === 0 ? answers.url : `http://${answers.url}`
 
   urlsObj[answers.name] = { url }
 
