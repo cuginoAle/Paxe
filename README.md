@@ -87,3 +87,9 @@ To test only some of the URLs listed in the `.paxerc` file use `--runOnly` or `-
 ```shell
 $> paxe -o site1,site2,site3
 ```
+
+---
+
+## Report example:
+
+![](https://i.imgur.com/lmATBiI.png)
