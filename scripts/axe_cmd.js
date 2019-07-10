@@ -13,7 +13,7 @@ async function test ({ name, url }, opts = {}) {
   const results = []
   await page.setBypassCSP(true)
 
-  const { viewports, authenticate, actions, runOnly, resultTypes, events = () => {}, destFolder, logo, ...optRest } = opts
+  const { viewports, authenticate, actions, runOnly, resultTypes, events, destFolder, logo, ...optRest } = opts
 
   if (authenticate) {
     events.onAttempt(`authenticating...`)
@@ -24,10 +24,13 @@ async function test ({ name, url }, opts = {}) {
   events.onAttempt('loading... ', 'earth', true)
   try {
     await page.goto(url)
+    events.onSuccess('loaded')
   } catch (error) {
-    throw error
+    await page.close()
+    await browser.close()
+    events.onError(error)
+    return [generateFailedTestPage({ error, destFolder, name, url })]
   }
-  events.onSuccess('loaded')
 
   if (actions) {
     const actionsSet = actions.map(a => {
@@ -187,10 +190,10 @@ function generateFailedTestPage ({ error, destFolder, name, url }) {
           font-size: 1.2rem;
         }
         .error {
-          font-size: 1.6rem;
-          background-color: white;
+          font-size: 1.1rem;
+          background-color: #000;
           padding: 1rem 2rem;
-          color: #ec542d;
+          color: #ffc000;
           border-radius: 5px;
           box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
