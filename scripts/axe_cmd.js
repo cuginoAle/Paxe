@@ -73,18 +73,7 @@ async function performAction (page, key, value, events) {
   events.onAttempt(`Action: ${key} `)
 
   try {
-    switch (key) {
-      case 'click':
-        await page.click(value)
-        break
-
-      case 'waitFor':
-        await page.waitFor(value)
-        break
-
-      default:
-        break
-    }
+    await page[key](value)
   } catch (error) {
     events.onError(`action error: ${error}`)
     return
