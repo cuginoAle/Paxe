@@ -69,7 +69,7 @@ The `options` section for each `url` is optional and can contain:
 - specific `vieports`
 - basic HTTP authentication settings
 
-The `actions` available are currently limited to `click` and `waitFor`. It can be mapped to perform all the actions Puppeteer is capable to run on the `page` object (see relevant doc)
+The `actions` available are all the actions Puppeteer is capable to run on the `page` object [see relevant doc](https://github.com/GoogleChrome/puppeteer/blob/v1.18.1/docs/api.md)
 
 ## Cli
 ```shell
