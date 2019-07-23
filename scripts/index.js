@@ -32,8 +32,6 @@ const {
 
 const getConfig = require('./getConfig')
 
-const progressBar = spinner()
-
 let paxeLogo = [
   ' __            ___ ',
   '|__)  /\\  \\_/ |__  ',
@@ -61,21 +59,24 @@ const runOnly = process.env.npm_config_runOnly ? process.env.npm_config_runOnly.
   const axResults = []
   const keys = Object.keys(urlsObj).filter(k => runOnly.length ? runOnly.includes(k) : true)
 
-  const tests = keys.map((name, i) => testUrl.bind(
-    null,
+  const testData = keys.map((name, index) => ({
     name,
-    i + 1,
-    keys.length,
-    {
+    url: urlsObj[name].url,
+    i: index + 1,
+    length: keys.length,
+    options: {
       ...config.default,
       ...urlsObj[name].options,
       logo: reportLogo
     }
-  ))
+  }))
 
   const start = Date.now()
+  const portion = Math.round(testData.length / 2)
+  const firstPart = testData.slice(0, portion).map((data) => testUrl.bind(null, data, 0))
+  const secondPart = testData.slice(portion).map((data) => testUrl.bind(null, data, 1))
 
-  inSequence(tests).then(() => {
+  Promise.all([inSequence(firstPart), inSequence(secondPart)]).then(() => {
     log()
     log(`🕑 Completed in ${chalk.green((Date.now() - start) / 1000)}s.`)
     log()
@@ -92,32 +93,31 @@ const runOnly = process.env.npm_config_runOnly ? process.env.npm_config_runOnly.
     process.exitCode = CriticalCount > 0 ? 1 : 0
   })
 
-  async function testUrl (name, i, length, options) {
-    const url = urlsObj[name].url
-    log()
-    log(`Test ${i}/${length} => ${chalk.bold(name)} `)
-
+  async function testUrl ({ name, url, i, length, options }, processIndex) {
     let start = Date.now()
+    const progressBar = spinner()
+
+    progressBar.log(`Test ${i}/${length} => ${chalk.bold(name)} `, processIndex)
 
     const opts = {
       ...options,
       destFolder,
       events: {
-        onSuccess: (msg, icon) => progressBar.success(msg, icon),
+        onSuccess: (msg, icon) => progressBar.success(msg, icon, processIndex),
         onAttempt: (msg, theme = 'dots2', trackTime) => {
           progressBar.start({
             label: msg,
             theme,
             trackTime
-          })
+          }, processIndex)
         },
         onTest: (msg) => {
           progressBar.start({
             label: `Testing ${msg} `,
             theme: 'fish'
-          })
+          }, processIndex)
         },
-        onError: (err) => progressBar.fail(err)
+        onError: (err) => progressBar.fail(err, processIndex)
       }
     }
 
@@ -126,8 +126,9 @@ const runOnly = process.env.npm_config_runOnly ? process.env.npm_config_runOnly.
       name
     }, opts)
 
-    progressBar.success(`done: ${(Date.now() - start) / 1000}s.`)
+    progressBar.success(`done: ${(Date.now() - start) / 1000}s.`, undefined, processIndex)
     axResults.push(...testResults)
+    return testResults
   }
 
   function formatAsTable (results) {
