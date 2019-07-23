@@ -1,6 +1,6 @@
 {
   "name": "@cuginoale/paxe",
-  "version": "0.4.12",
+  "version": "0.4.13",
   "description": "Puppeteer & Axe ♿ testing framework",
   "repository": {
     "type": "git",
