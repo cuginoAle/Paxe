@@ -83,6 +83,7 @@ async function performAction (page, key, value, events) {
 }
 
 async function prepare ({ vp, name, url, page, options, results, events, destFolder, logo }) {
+  events.onAttempt(`Resizing...`)
   await page.setViewport(vp)
   events.onSuccess(`Resized to ${vp.width} x ${vp.height}`)
 
@@ -90,6 +91,7 @@ async function prepare ({ vp, name, url, page, options, results, events, destFol
   const reportName = `${name}_${vp.width}x${vp.height}`
   try {
     results.push(await runTest({ name: reportName, url, page, options, destFolder, logo }))
+    events.onSuccess('Test complete')
   } catch (error) {
     results.push(generateFailedTestPage({ error, destFolder, name: reportName, url }))
     events.onError(error)
