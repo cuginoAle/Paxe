@@ -6,6 +6,7 @@ const axe = require('./axe_cmd')
 const spinner = require('./spinner')
 const inSequence = require('./insequence')
 const chalk = require('chalk')
+const slug = require('slug')
 
 const ver = require('../package.json').version
 const generateGlobalHtmlReport = require('./globalHtmlReport')
@@ -60,7 +61,7 @@ const runOnly = process.env.npm_config_runOnly ? process.env.npm_config_runOnly.
   const keys = Object.keys(urlsObj).filter(k => runOnly.length ? runOnly.includes(k) : true)
 
   const testData = keys.map((name, index) => ({
-    name,
+    name: slug(name),
     url: urlsObj[name].url,
     i: index + 1,
     length: keys.length,

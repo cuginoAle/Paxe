@@ -32,6 +32,7 @@
     "inquirer": "^6.5.0",
     "inquirer-fuzzy-path": "^2.0.3",
     "puppeteer": "^1.18.1",
+    "slug": "^1.1.0",
     "table": "^5.4.4",
     "yargs": "^13.3.0"
   }
