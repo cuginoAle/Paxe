@@ -4,7 +4,7 @@
   "description": "Puppeteer & Axe ♿ testing framework",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cuginoAle/a11yTests.git"
+    "url": "https://github.com/cuginoAle/Paxe.git"
   },
   "keywords": [
     "accessibility",
@@ -19,9 +19,7 @@
     "paxe": "./scripts/index.js"
   },
   "scripts": {
-    "test": "node ./scripts/index.js $npm_package_version",
-    "pa11y": "node ./scripts/pa11y.js",
-    "lh": "node ./scripts/lighthouse.js"
+    "paxe": "node ./scripts/index.js "
   },
   "author": "Alessio Carnevale",
   "license": "ISC",
