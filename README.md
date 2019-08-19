@@ -11,6 +11,13 @@ It runs from the command line and generates HTML reports for each page and each 
 **It is still a WIP, feedbacks and contributions are highly appreciated!**
 
 # Get started
+For a quick test you can run:
+```shell
+- $> npx @cuginoale/paxe
+```
+
+
+If you plan to use it frequently or if it's going to be part of your workflow:
 ```shell
 - $> npm i -g @cuginoale/paxe
 - $> cd path/to/your/project/folder
